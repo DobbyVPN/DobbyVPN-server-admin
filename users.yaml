@@ -1,0 +1,20 @@
+#example - still in work
+users:
+  - user_id: "a1b2c3d4"
+    name: "user1"
+    devices:
+      - device_id: "d1e2f3g4"
+        device_name: "device1"
+        wireguard_key: "wireguard_key1"
+        outline_key: "outline_key1"
+      - device_id: "h5i6j7k8"
+        device_name: "device2"
+        wireguard_key: "wireguard_key2"
+        outline_key: "outline_key2"
+  - user_id: "l9m0n1o2"
+    name: "user2"
+    devices:
+      - device_id: "p3q4r5s6"
+        device_name: "device3"
+        wireguard_key: "wireguard_key3"
+        outline_key: "outline_key3"
