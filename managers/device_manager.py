@@ -1,5 +1,5 @@
 from managers.data_manager import load_data, save_data, find_user_by_id, generate_id
-from vpn_interface.wireguard_manager import generate_wireguard_keys, add_wireguard_peer, remove_wireguard_peer
+# from vpn_interface.wireguard_manager import generate_wireguard_keys, add_wireguard_peer, remove_wireguard_peer
 from vpn_interface.outline_manager import create_outline_access_key, delete_outline_access_key
 
 def add_device(user_id, device_name):
@@ -13,18 +13,19 @@ def add_device(user_id, device_name):
             raise ValueError(f"Устройство {device_name} уже существует у пользователя {user['name']}.")
     device_id = generate_id()
     # Генерация ключей
-    wg_private_key, wg_public_key = generate_wireguard_keys()
+
+    # wg_private_key, wg_public_key = generate_wireguard_keys() - coming soon
     outline_key = create_outline_access_key()
     new_device = {
         'device_id': device_id,
         'device_name': device_name,
-        'wireguard_key': wg_public_key,
+        #'wireguard_key': wg_public_key, - coming soon
         'outline_key': outline_key
     }
     user['devices'].append(new_device)
     save_data(data)
     # Обновление конфигураций VPN
-    add_wireguard_peer(wg_public_key)
+    # add_wireguard_peer(wg_public_key) - coming soon
     return new_device
 
 def delete_device(user_id, device_id):
@@ -37,7 +38,7 @@ def delete_device(user_id, device_id):
     if not device:
         raise ValueError(f"Устройство с ID {device_id} не найдено у пользователя {user['name']}.")
     # Удаление устройства из конфигураций VPN
-    remove_wireguard_peer(device['wireguard_key'])
+    # remove_wireguard_peer(device['wireguard_key']) - - coming soon
     delete_outline_access_key(device['outline_key'])
     # Удаление устройства из данных пользователя
     user['devices'].remove(device)
