@@ -2,7 +2,7 @@ from managers.data_manager import load_data, save_data, find_user_by_id, generat
 # from vpn_interface.wireguard_manager import generate_wireguard_keys, add_wireguard_peer, remove_wireguard_peer
 from vpn_interface.outline_manager import create_outline_access_key, delete_outline_access_key
 
-def add_device(user_id, device_name):
+def add_device(user_id, device_name, key_name):
     """Добавляет устройство для пользователя с генерацией уникального device_id."""
     data = load_data()
     user = find_user_by_id(data, user_id)
@@ -15,7 +15,7 @@ def add_device(user_id, device_name):
     # Генерация ключей
 
     # wg_private_key, wg_public_key = generate_wireguard_keys() - coming soon
-    outline_key = create_outline_access_key()
+    outline_key = create_outline_access_key(key_name)
     new_device = {
         'device_id': device_id,
         'device_name': device_name,
