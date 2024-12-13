@@ -18,8 +18,9 @@ load_dotenv(dotenv_path="../.env")
 # --------------------------------------------
 # Настройки для подключения к Outline серверу
 # --------------------------------------------
-API_URL = os.getenv("OUTLINE_API_URL", "https://your-outline-server:port")
-CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256", "your_cert_sha256_fingerprint")
+API_URL = os.getenv("OUTLINE_API_URL")
+CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256")
+print(API_URL, CERT_SHA256)
 
 # --------------------------------------------
 # Классы и исключения из предоставленной обёртки API Outline
