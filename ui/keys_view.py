@@ -24,7 +24,7 @@ class KeysView(Screen):
         self.load_devices()
         yield self.table
         if self.mode == "delete":
-            yield Button("Удалить выбранный ключ", name="del")
+            yield Button.error("Удалить выбранный ключ", name="del")
             yield Button("Назад", name="back")
         elif self.mode == "rename":
             self.rename_input = Input(placeholder="Новое имя", name="rename_input")

@@ -10,8 +10,8 @@ class AddKeyView(Screen):
         yield Static("Добавление нового ключа. Введите имя:")
         self.input_name = Input(placeholder="Имя ключа")
         yield self.input_name
-        yield Button("Создать", name="create")
-        yield Button("Отмена", name="cancel")
+        yield Button("Создать", name="create",variant="primary")
+        yield Button("Назад", name="cancel")
 
     def on_button_pressed(self, event):
         if event.button.name == "create":
@@ -23,6 +23,6 @@ class AddKeyView(Screen):
             # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
             add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
             self.app.push_screen(MessageView("Готово", f"Ключ '{name}' создан."))
-            self.app.pop_screen()
+            #self.app.pop_screen()
         elif event.button.name == "cancel":
             self.app.pop_screen()
