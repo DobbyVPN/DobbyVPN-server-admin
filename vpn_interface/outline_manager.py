@@ -183,7 +183,9 @@ class OutlineVPN:
         response = self.session.delete(
             f"{self.api_url}/access-keys/{key_id}", verify=False, timeout=timeout
         )
-        return response.status_code == 204
+        if response.status_code == 204:
+            return response.status_code == 204
+        raise OutlineServerErrorException(f"Unable to delete key. {response.text}")
 
     def rename_key(self, key_id: str, name: str, timeout: int = None):
         files = {
