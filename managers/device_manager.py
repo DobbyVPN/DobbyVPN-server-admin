@@ -39,7 +39,7 @@ def delete_device(user_id, device_id):
         raise ValueError(f"Устройство с ID {device_id} не найдено у пользователя {user['name']}.")
     # Удаление устройства из конфигураций VPN
     # remove_wireguard_peer(device['wireguard_key']) - - coming soon
-    delete_outline_access_key(device['outline_key'])
+    delete_outline_access_key(device_id)
     # Удаление устройства из данных пользователя
     user['devices'].remove(device)
     save_data(data)

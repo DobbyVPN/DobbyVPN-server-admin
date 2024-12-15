@@ -51,11 +51,12 @@ class KeysView(Screen):
     def delete_selected_device(self):
         selected = self.table.cursor_row
         if selected is not None:
-            device_id = self.table.rows[selected][0]
+            row_data = self.table.get_row_at(selected)
+            device_id = row_data[0]
             delete_device("admin", device_id)
             self.table.clear()
             self.load_devices()
-            self.app.push_screen(MessageView("Готово", "Ключ удалён."))
+            self.app.push_screen(MessageView("Готово", f"Ключ удалён.{device_id}"))
 
     def rename_selected_device(self):
         selected = self.table.cursor_row
@@ -63,7 +64,8 @@ class KeysView(Screen):
             input_widget = self.query_one('Input[name="rename_input"]', Input)
             new_name = input_widget.value.strip()
             if new_name:
-                device_id = self.table.rows[selected][0]
+                row_data = self.table.get_row_at(selected)
+                device_id = row_data[0]
                 edit_device_name("admin", device_id, new_name)
                 self.table.clear()
                 self.load_devices()
