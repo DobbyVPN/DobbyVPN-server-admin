@@ -4,6 +4,8 @@ from textual.screen import Screen
 from textual.widgets import Static, Button
 from textual.containers import Vertical
 
+
+
 class MessageView(Screen):
     def __init__(self, title: str, message: str):
         super().__init__()
