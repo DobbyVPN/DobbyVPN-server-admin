@@ -20,7 +20,7 @@ load_dotenv(dotenv_path="../.env")
 # --------------------------------------------
 API_URL = os.getenv("OUTLINE_API_URL")
 CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256")
-print(API_URL, CERT_SHA256)
+#print(API_URL, CERT_SHA256)
 
 # --------------------------------------------
 # Классы и исключения из предоставленной обёртки API Outline
@@ -313,7 +313,7 @@ class OutlineVPN:
 try:
     outline_vpn = OutlineVPN(api_url=API_URL, cert_sha256=CERT_SHA256)
 except OutlineLibraryException as e:
-    print(f"Ошибка инициализации OutlineVPN: {e}")
+    #print(f"Ошибка инициализации OutlineVPN: {e}")
     outline_vpn = None
 
 
@@ -357,12 +357,21 @@ def get_outline_access_keys() -> typing.List[OutlineKey]:
     Получает список всех ключей доступа из Outline Server.
     Возвращает список OutlineKey.
     """
+    global outline_vpn
+    load_dotenv(dotenv_path="../.env")
+    API_URL = os.getenv("OUTLINE_API_URL")
+    CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256")
+    try:
+        outline_vpn = OutlineVPN(api_url=API_URL, cert_sha256=CERT_SHA256)
+    except OutlineLibraryException as e:
+        print(f"Ошибка инициализации OutlineVPN: {e}")
+        return []
+
     if outline_vpn is None:
         print("OutlineVPN не инициализирован")
         return []
     try:
-        keys = outline_vpn.get_keys()
-        return keys
+        return outline_vpn.get_keys()
     except OutlineServerErrorException as e:
         print(f"Ошибка получения ключей Outline: {e}")
         return []

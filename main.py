@@ -3,7 +3,6 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from textual.app import App
-from textual.reactive import var
 from ui.login_view import LoginView
 from ui.main_view import MainView
 from ui.message_view import MessageView

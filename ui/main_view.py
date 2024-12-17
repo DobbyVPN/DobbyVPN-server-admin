@@ -1,15 +1,11 @@
 # ui/main_view.py
 
-from textual.screen import Screen
 from textual.widgets import Static, Button
 from textual.containers import Vertical
 
 from ui.base_screen import BaseScreen
 from ui.keys_view import KeysView
 from ui.login_view import LoginView
-from ui.message_view import MessageView
-from vpn_interface.outline_manager import get_outline_access_keys
-from managers.data_manager import load_data, save_data
 
 class MainView(BaseScreen):
     def compose(self):

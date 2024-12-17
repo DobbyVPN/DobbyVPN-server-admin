@@ -1,7 +1,6 @@
 # ui/keys_view.py
 from textual.events import Show
 from textual.widgets import Static, Button, DataTable
-from managers.data_manager import load_data
 from managers.device_manager import delete_device
 from ui.base_screen import BaseScreen
 from ui.message_view import MessageView

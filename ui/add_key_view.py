@@ -1,6 +1,5 @@
 # ui/add_key_view.py
 
-from textual.screen import Screen
 from textual.widgets import Static, Input, Button
 from managers.device_manager import add_device
 from ui.base_screen import BaseScreen

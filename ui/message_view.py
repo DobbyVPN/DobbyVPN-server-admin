@@ -2,8 +2,6 @@
 
 from textual.screen import Screen
 from textual.widgets import Static, Button
-from textual.containers import Vertical
-
 
 
 class MessageView(Screen):

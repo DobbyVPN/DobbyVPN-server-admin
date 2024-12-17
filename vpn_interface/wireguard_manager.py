@@ -1,4 +1,3 @@
-import subprocess
 from python_wireguard import key, Key
 
 # заменить на свое
