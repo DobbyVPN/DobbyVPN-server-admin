@@ -1,38 +1,45 @@
 # Outline Admin Interface
 
-**Outline Admin Interface** предоставляет удобный интерфейс для управления ключами Outline VPN. Приложение обладает интуитивно понятным терминальным интерфейсом, созданным с помощью библиотеки Textual.
+**Outline Admin Interface** provides a user-friendly interface for managing Outline VPN keys. The application features an intuitive terminal-based interface built using the Textual library.
 
-## Возможности
+## Features
 
-- Просмотр всех ключей Outline VPN
-- Добавление новых ключей
-- Удаление существующих ключей
-- Переименование ключей
-- Обновление ключей с сервера Outline
-- Управление переменными окружения через `.env` файл
+- **View All Outline VPN Keys:** Easily browse through all existing VPN keys.
+- **Add New Keys:** Generate and add new Outline VPN keys seamlessly.
+- **Delete Existing Keys:** Remove outdated or unnecessary VPN keys with ease.
+- **Rename Keys:** Customize the names of your VPN keys for better organization.
+- **Update Keys from Outline Server:** Keep your VPN keys up-to-date by syncing with the Outline server.
+- **Manage Environment Variables via `.env` File:** Efficiently handle environment configurations through a simple `.env` file.
 
-## Установка
+## Installation
 
-### Предварительные требования
+### Prerequisites
 
-- Python 3.8 или выше
-- pip
+- **Python 3.8 or higher**
+- **pip** (Python package installer)
 
-### Шаги установки
+### Installation Steps
 
-1. **Клонируйте репозиторий или скачайте архив с исходным кодом:**
+1. **Clone the Repository or Download the Source Code Archive:**
 
-   ```bash
-   git clone https://github.com/xaeliudzyh/Outline-Admin-TUI.git
-   
-2. **Перейдите в директорию проекта**
     ```bash
-   cd Outline-Admin-TUI
-   
-3. **Установите зависимости**
+    git clone https://github.com/xaeliudzyh/Outline-Admin-TUI.git
+    ```
+
+2. **Navigate to the Project Directory:**
+
+    ```bash
+    cd Outline-Admin-TUI
+    ```
+
+3. **Install Dependencies:**
+
     ```bash
     pip install -r requirements.txt
+    ```
 
-4. **После успешной установки зависимостей, запустите приложение командой**
+4. **After Successfully Installing Dependencies, Run the Application with the Following Command:**
+
     ```bash
-   python main.py
+    python main.py
+    ```
