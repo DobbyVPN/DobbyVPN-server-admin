@@ -14,12 +14,13 @@ from dotenv import load_dotenv
 from urllib3 import PoolManager
 from dataclasses import dataclass
 
+from helper.parser import parse_env_json
+
 load_dotenv(dotenv_path="../.env")
 # --------------------------------------------
 # Настройки для подключения к Outline серверу
 # --------------------------------------------
-API_URL = os.getenv("OUTLINE_API_URL")
-CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256")
+API_URL, CERT_SHA256 = parse_env_json("Json")
 #print(API_URL, CERT_SHA256)
 
 # --------------------------------------------
@@ -359,8 +360,7 @@ def get_outline_access_keys() -> typing.List[OutlineKey]:
     """
     global outline_vpn
     load_dotenv(dotenv_path="../.env")
-    API_URL = os.getenv("OUTLINE_API_URL")
-    CERT_SHA256 = os.getenv("OUTLINE_CERT_SHA256")
+    API_URL, CERT_SHA256 = parse_env_json("Json")
     try:
         outline_vpn = OutlineVPN(api_url=API_URL, cert_sha256=CERT_SHA256)
     except OutlineLibraryException as e:

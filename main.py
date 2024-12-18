@@ -1,5 +1,7 @@
 # main.py
 import os
+from shutil import Error
+
 from dotenv import load_dotenv
 load_dotenv()
 from textual.app import App
@@ -16,12 +18,11 @@ class AdminApp(App):
     # main.py
     async def on_ready(self):
         print("Приложение начало работу")
-        api_url = os.getenv("OUTLINE_API_URL")
-        cert = os.getenv("OUTLINE_CERT_SHA256")
-
+        from helper.parser import parse_env_json
+        api_url, cert = parse_env_json("Json")
         if not api_url or not cert:
-            print("Не найдены переменные окружения. Переход на LoginView.")
-            await self.push_screen(LoginView())
+            raise Error("api_url and cert weren't found in .env file.")
+            #await self.push_screen(LoginView())
         else:
             print(f"Переменные окружения найдены: API_URL={api_url}, CERT={cert}")
             keys = get_outline_access_keys()

@@ -12,7 +12,7 @@ class MainView(BaseScreen):
         yield Static("Main menu:")
         yield Vertical(
             Button("Manage Keys", name="show_keys"),
-            Button("Sign Out", name="sign_out"),
+            #Button("Sign Out", name="sign_out"),
             #Button("Обновить ключи с сервера Outline", name="refresh"),
             #Button("+", name="add_key"),
             #Button("Удалить ключ", name="del_key"),
@@ -23,8 +23,8 @@ class MainView(BaseScreen):
     def on_button_pressed(self, event):
         if event.button.name == "show_keys":
             self.app.push_screen(KeysView())
-        elif event.button.name == "sign_out":
-            self.app.push_screen(LoginView())
+        #elif event.button.name == "sign_out":
+        #    self.app.push_screen(LoginView())
         elif event.button.name == "exit":
             self.app.exit()
         '''
