@@ -11,6 +11,14 @@
 - **Update Keys from Outline Server:** Keep your VPN keys up-to-date by syncing with the Outline server.
 - **Manage Environment Variables via `.env` File:** Efficiently handle environment configurations through a simple `.env` file.
 
+## Important!!!
+**That's the example of .env file**
+   ```bash
+    {Json="apiUrl":"...","certSha256":"..."}
+   ```
+
+
+
 ## Installation
 
 ### Prerequisites
