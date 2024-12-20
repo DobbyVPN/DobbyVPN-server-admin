@@ -37,19 +37,20 @@ class KeysView(BaseScreen):
         self.table = DataTable()
         self.table.add_column("Device ID")
         self.table.add_column("Name")
-        self.table.add_column("Outline Key")
+        self.table.add_column("Used Bytes")
+        #self.table.add_column("Outline Key")
         self.refresh_keys()
         self.load_devices()
         yield self.table
         yield Button("Create a key", name="add_key", variant="success")
         yield Button("Renaming mode", name="rename", variant="primary")
         yield Button.error("Delete chosen key", name="del")
-        yield Button("Back", name="back")
+        #yield Button("Back", name="back")
 
     def on_button_pressed(self, event):
-        if event.button.name == "back":
-            self.app.pop_screen()
-        elif event.button.name == "del":
+        #if event.button.name == "back":
+        #    self.app.pop_screen()
+        if event.button.name == "del":
             self.delete_selected_device()
         elif event.button.name == "rename":
             self.app.push_screen(RenameKeyView())

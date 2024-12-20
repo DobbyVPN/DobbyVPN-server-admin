@@ -8,8 +8,8 @@ from ui.message_view import MessageView
 class AddKeyView(BaseScreen):
     BINDINGS = [
         Binding("ctrl+s", "save_key", "Save Key"),
-        Binding("ctrl+b", "go_back", "Go Back"),
-        Binding("ctrl+b", "go_back", "Go Back"),
+        #Binding("ctrl+b", "go_back", "Go Back"),
+        #Binding("ctrl+b", "go_back", "Go Back"),
         Binding("down", "focus_next", "Go down", show=False),
         Binding("up", "focus_previous", "Go up", show=False)
     ]
@@ -37,10 +37,6 @@ class AddKeyView(BaseScreen):
         # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
         add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
         self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
-
-    def action_go_back(self):
-        """Возврат на предыдущий экран."""
-        self.app.pop_screen()
 
     def on_button_pressed(self, event):
         if event.button.name == "create":
