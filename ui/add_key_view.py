@@ -28,7 +28,9 @@ class AddKeyView(BaseScreen):
         yield Button("Create", name="create",variant="primary")
         yield Button("Back", name="cancel")
 
-    def action_save_key(self):
+
+
+    def create_key(self):
         name = self.input_name.value.strip()
         if not name:
             self.app.push_screen(MessageView("Error", "You must enter a name"))
@@ -36,18 +38,14 @@ class AddKeyView(BaseScreen):
         # Допустим add_device(user_id, device_name, key_name?)
         # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
         add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
-        #self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
+        # self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
+        self.app.pop_screen()
+
+    def action_save_key(self):
+        self.create_key()
 
     def on_button_pressed(self, event):
         if event.button.name == "create":
-            name = self.input_name.value.strip()
-            if not name:
-                self.app.push_screen(MessageView("Error", "You must enter a name"))
-                return
-            # Допустим add_device(user_id, device_name, key_name?)
-            # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
-            add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
-            self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
-            #self.app.pop_screen()
+            self.create_key()
         elif event.button.name == "cancel":
             self.app.pop_screen()

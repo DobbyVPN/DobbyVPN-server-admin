@@ -75,5 +75,8 @@ class KeysView(BaseScreen):
             device_id = row_data[0]
             delete_device("admin", device_id)
             #self.app.push_screen(MessageView("Success", f"Key has been deleted. ID: {device_id}"))
+            #self.app.pop_screen()
+            self.refresh_keys()
+            self.load_devices()
         else:
             self.app.push_screen(MessageView("Error", "No key selected."))
