@@ -53,7 +53,7 @@ class RenameKeyView(BaseScreen):
                 self.table.clear()
                 self.refresh_keys()
                 self.load_devices()
-                self.app.push_screen(MessageView("Ready", "The key has been renamed."))
+                #self.app.push_screen(MessageView("Ready", "The key has been renamed."))
             else:
                 self.app.push_screen(MessageView("Error", "The new name cannot be empty."))
         else:

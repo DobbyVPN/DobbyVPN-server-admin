@@ -36,7 +36,7 @@ class AddKeyView(BaseScreen):
         # Допустим add_device(user_id, device_name, key_name?)
         # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
         add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
-        self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
+        #self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
 
     def on_button_pressed(self, event):
         if event.button.name == "create":
