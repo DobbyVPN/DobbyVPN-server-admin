@@ -1,6 +1,6 @@
 # ui/main_view.py
-
-from textual.widgets import Static, Button
+#UNUSED
+from textual.widgets import Static, Button, Footer
 from textual.containers import Vertical
 
 from ui.base_screen import BaseScreen
@@ -9,6 +9,7 @@ from ui.login_view import LoginView
 
 class MainView(BaseScreen):
     def compose(self):
+        yield Footer()
         yield Static("Main menu:")
         yield Vertical(
             Button("Manage Keys", name="show_keys"),
@@ -19,6 +20,8 @@ class MainView(BaseScreen):
             #Button("Переименовать ключ", name="rename_key"),
             Button("Close", name="exit")
         )
+
+
 
     def on_button_pressed(self, event):
         if event.button.name == "show_keys":

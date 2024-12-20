@@ -1,2 +1,25 @@
 users:
-  []
+- devices:
+  - device_id: '4'
+    device_name: tsagoll_ios
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTplT0xxekxMZk5WNGUxbU9OUjVWQXh2@195.201.111.36:40287/?outline=1
+  - device_id: '5'
+    device_name: tsagoll_macos
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpHeW5DUmt3OFhld09CNkpneDRjWjBs@195.201.111.36:40287/?outline=1
+  - device_id: '6'
+    device_name: tsagoll_windowsssss
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTp2V20xUXFvcXBhMU1ZVXN3aGxNT1VI@195.201.111.36:40287/?outline=1
+  - device_id: '7'
+    device_name: budimir_test
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpTUU53NFdYc3BZZnRtaEt5dU9ZcEFN@195.201.111.36:40287/?outline=1
+  - device_id: '28'
+    device_name: igor_winows__
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpEMlRNcDBBSG5LOE5LNERnWmZXdDVV@195.201.111.36:40287/?outline=1
+  - device_id: '31'
+    device_name: vladislav_key
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpvQVRnbUI0RHF4TERDT1V6YVNNRXFZ@195.201.111.36:40287/?outline=1
+  - device_id: '35'
+    device_name: "\u043E\u043E\u043E\u043E\u043E"
+    outline_key: ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpUT092dE4wbTVrMk5MdnFTVXdsZ25I@195.201.111.36:40287/?outline=1
+  name: admin_user
+  user_id: admin

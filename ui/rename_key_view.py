@@ -1,5 +1,5 @@
 #ui/keys_view.py
-
+from textual.binding import Binding
 from textual.widgets import Static, Button, DataTable, Input
 from ui.base_screen import BaseScreen
 from ui.message_view import MessageView
@@ -13,6 +13,17 @@ class RenameKeyView(BaseScreen):
         super().__init__()
         self.mode = mode
         self.rename_input = None
+
+    BINDINGS=[
+        Binding("down", "focus_next", "Go down", show=False),
+        Binding("up", "focus_previous", "Go up", show=False)
+    ]
+
+    def action_focus_previous(self):
+        self.focus_previous()
+
+    def action_focus_next(self):
+        self.focus_next()
 
     def compose(self):
         yield Static("Keys:")

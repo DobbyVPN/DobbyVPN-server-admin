@@ -3,10 +3,17 @@ import os
 from shutil import Error
 
 from dotenv import load_dotenv
+from textual.binding import Binding
+from textual.widgets import Footer
+
+from ui.add_key_view import AddKeyView
+from ui.base_screen import BaseScreen
+from ui.keys_view import KeysView
+
 load_dotenv()
 from textual.app import App
-from ui.login_view import LoginView
-from ui.main_view import MainView
+#from ui.login_view import LoginView
+#from ui.main_view import MainView
 from ui.message_view import MessageView
 from vpn_interface.outline_manager import get_outline_access_keys
 from managers.data_manager import load_data, save_data
@@ -15,7 +22,27 @@ from managers.data_manager import load_data, save_data
 
 class AdminApp(App):
     TITLE = "Outline Admin Interface"
-    # main.py
+    BINDINGS = [
+        Binding("ctrl+a","add", "Add new key"),
+        Binding("ctrl+c", "quit", "Quit app"),
+        #Binding("down", "focus_next", "Go down", show=False)
+    ]
+
+
+    def action_quit(self):
+        self.exit()
+
+    def action_add(self):
+        self.push_screen(AddKeyView())
+
+    def action_keys(self):
+        if self.screen == KeysView():
+            pass
+        self.push_screen(KeysView())
+
+    def compose(self):
+        yield Footer()
+
     async def on_ready(self):
         print("Приложение начало работу")
         from helper.parser import parse_env_json
@@ -33,7 +60,7 @@ class AdminApp(App):
             else:
                 self.update_users_yaml_with_keys(keys)
                 print("Ключи успешно загружены, переход на MainView.")
-                await self.push_screen(MainView())
+                await self.push_screen(KeysView())
 
     def update_users_yaml_with_keys(self, keys):
         data = load_data()
@@ -56,6 +83,7 @@ class AdminApp(App):
             }
             user['devices'].append(device)
         save_data(data)
+
 
 
 if __name__ == "__main__":

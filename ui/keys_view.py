@@ -1,6 +1,7 @@
 # ui/keys_view.py
+from textual.binding import Binding
 from textual.events import Show
-from textual.widgets import Static, Button, DataTable
+from textual.widgets import Static, Button, DataTable, Footer
 from managers.device_manager import delete_device
 from ui.base_screen import BaseScreen
 from ui.message_view import MessageView
@@ -8,12 +9,30 @@ from ui.rename_key_view import RenameKeyView
 
 
 class KeysView(BaseScreen):
+    table = DataTable()
+
+    BINDINGS = [
+        Binding("ctrl+d","delete","Delete chosen key"),
+        Binding("down", "focus_next", "Go down", show=False),
+        Binding("up", "focus_previous", "Go up", show=False)
+    ]
+
+    def action_focus_previous(self):
+        self.focus_previous()
+
+    def action_focus_next(self):
+        self.focus_next()
+
+    def action_delete(self):
+        self.delete_selected_device()
+
     def __init__(self, mode=None):
         super().__init__()
         self.table = None
         self.rename_input = None  # Инициализируем переменную для хранения ссылки на Input
 
     def compose(self):
+        yield Footer()
         yield Static("Keys:")
         self.table = DataTable()
         self.table.add_column("Device ID")
