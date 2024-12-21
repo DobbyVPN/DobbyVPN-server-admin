@@ -16,7 +16,7 @@ from vpn_interface.outline_manager import get_outline_access_keys
 class LoginView(BaseScreen):
     def compose(self):
         yield Static("Enter JSON with apiUrl and certSha256:")
-        # Пример: {"apiUrl":"https://195.201.111.36:43180/KlvPGo_8P1ZDCmGmrHxxgg","certSha256":"..."}
+        # example: {"apiUrl":"https://195.201.111.36:43180/KlvPGo_8P1ZDCmGmrHxxgg","certSha256":"..."}
         self.json_input = Input(placeholder='{"apiUrl":"...","certSha256":"..."}')
         yield self.json_input
         yield Horizontal(
@@ -26,7 +26,6 @@ class LoginView(BaseScreen):
 
     def update_users_yaml_with_keys(self, keys):
         data = load_data()
-        # Предположим один пользователь admin
         user = None
         for u in data['users']:
             if u['user_id'] == 'admin':
@@ -36,7 +35,6 @@ class LoginView(BaseScreen):
             user = {'user_id': 'admin', 'name': 'admin_user', 'devices': []}
             data['users'].append(user)
         user['devices'].clear()
-        # Заполняем devices данными из keys
         for k in keys:
             device = {
                 'device_id': k.key_id,
@@ -62,20 +60,17 @@ class LoginView(BaseScreen):
                 set_key(".env", "OUTLINE_API_URL", api_url)
                 set_key(".env", "OUTLINE_CERT_SHA256", cert)
                 #time.sleep(1)
-                load_dotenv()  # Перезагрузка окружения
+                load_dotenv()
                 from vpn_interface.outline_manager import get_outline_access_keys
                 #self.app.outline_vpn = OutlineVPN(api_url=os.getenv("OUTLINE_API_URL"), cert_sha256=os.getenv("OUTLINE_CERT_SHA256"))
-                # Проверим загрузку ключей
                 keys = get_outline_access_keys()
                 if keys is None:
                     self.app.push_screen(MessageView("Error", "Incorrect data. Failed to load keys."))
                 else:
                     self.update_users_yaml_with_keys(keys)
                     self.app.push_screen(MessageView("Success", "Correct JSON format"))
-                    # Обновим users.yaml
                     from main import AdminApp
-                    self.app.pop_screen()  # Закрываем LoginView
-                    # main app уже запущен, обновим теперь экран:
+                    self.app.pop_screen()
                     from ui.main_view import MainView
                     self.app.push_screen(MainView())
             except json.JSONDecodeError:

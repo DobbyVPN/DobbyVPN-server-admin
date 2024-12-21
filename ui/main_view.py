@@ -13,11 +13,6 @@ class MainView(BaseScreen):
         yield Static("Main menu:")
         yield Vertical(
             Button("Manage Keys", name="show_keys"),
-            #Button("Sign Out", name="sign_out"),
-            #Button("Обновить ключи с сервера Outline", name="refresh"),
-            #Button("+", name="add_key"),
-            #Button("Удалить ключ", name="del_key"),
-            #Button("Переименовать ключ", name="rename_key"),
             Button("Close", name="exit")
         )
 

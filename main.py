@@ -51,20 +51,18 @@ class AdminApp(App):
             raise Error("api_url and cert weren't found in .env file.")
             #await self.push_screen(LoginView())
         else:
-            print(f"Переменные окружения найдены: API_URL={api_url}, CERT={cert}")
             keys = get_outline_access_keys()
             if keys is None:
-                print("Не удалось загрузить ключи. Ошибка API.")
+                print("Error getting keys.")
                 await self.push_screen(
-                    MessageView("Ошибка", "Не удалось загрузить ключи Outline. Проверьте API URL и CERT."))
+                    MessageView("Error", "Error getting keys. Check API URL and CERT."))
             else:
                 self.update_users_yaml_with_keys(keys)
-                print("Ключи успешно загружены, переход на MainView.")
+                print("Success")
                 await self.push_screen(KeysView())
 
     def update_users_yaml_with_keys(self, keys):
         data = load_data()
-        # Предположим один пользователь admin
         user = None
         for u in data['users']:
             if u['user_id'] == 'admin':
@@ -74,7 +72,6 @@ class AdminApp(App):
             user = {'user_id': 'admin', 'name': 'admin_user', 'devices': []}
             data['users'].append(user)
         user['devices'].clear()
-        # Заполняем devices данными из keys
         for k in keys:
             device = {
                 'device_id': k.key_id,

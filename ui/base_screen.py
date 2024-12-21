@@ -45,7 +45,7 @@ class BaseScreen(Screen):
                 used_str = "0"
             else:
                 mb = used_bytes / (1024 * 1024)
-                if mb > 1024:  # больше 1 ГБ
+                if mb > 1024:  # more than 1gb
                     gb = mb / 1024
                     used_str = f"{gb:.2f} GB"
                 else:

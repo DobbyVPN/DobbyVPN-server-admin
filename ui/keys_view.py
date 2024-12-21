@@ -29,10 +29,12 @@ class KeysView(BaseScreen):
     def __init__(self, mode=None):
         super().__init__()
         self.table = None
-        self.rename_input = None  # Инициализируем переменную для хранения ссылки на Input
+        self.rename_input = None
+        self.new_device_id = None
 
     def compose(self):
         yield Footer()
+        yield Button("Create a key", name="add_key", variant="success")
         yield Static("Keys:")
         self.table = DataTable()
         self.table.add_column("Device ID")
@@ -42,14 +44,11 @@ class KeysView(BaseScreen):
         self.refresh_keys()
         self.load_devices()
         yield self.table
-        yield Button("Create a key", name="add_key", variant="success")
+
         yield Button("Renaming mode", name="rename", variant="primary")
         yield Button.error("Delete chosen key", name="del")
-        #yield Button("Back", name="back")
 
     def on_button_pressed(self, event):
-        #if event.button.name == "back":
-        #    self.app.pop_screen()
         if event.button.name == "del":
             self.delete_selected_device()
         elif event.button.name == "rename":
@@ -62,11 +61,25 @@ class KeysView(BaseScreen):
         self.refresh_keys()
         self.load_devices()
 
-    def on_screen_resume(self):
+    def on_screen_resume(self, return_value = None):
+        if len(self.app.screen_stack) >= 2:
+            prev_screen = self.app.screen_stack[-2]
+            if hasattr(prev_screen, "result") and prev_screen.result:
+                self.new_device_id = prev_screen.result
         self.table.clear()
         self.refresh_keys()
         self.load_devices()
+        if self.new_device_id:
+            self.select_added_device(self.new_device_id)
+            self.new_device_id = None
 
+    def select_added_device(self, device_id):
+        for index, row in enumerate(self.table.rows):
+            row_device_id = row[0]
+            if row_device_id == device_id:
+                self.table.cursor_type = "row"
+                self.table.cursor_row = index
+                break
 
     def delete_selected_device(self):
         selected = self.table.cursor_row

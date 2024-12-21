@@ -1,4 +1,6 @@
 # ui/add_key_view.py
+from symbol import return_stmt
+
 from textual.binding import Binding
 from textual.widgets import Static, Input, Button, Footer
 from managers.device_manager import add_device
@@ -35,11 +37,9 @@ class AddKeyView(BaseScreen):
         if not name:
             self.app.push_screen(MessageView("Error", "You must enter a name"))
             return
-        # Допустим add_device(user_id, device_name, key_name?)
-        # Если изменен add_device для Outline ключей (key_name?), надо передать туда name
-        add_device("admin", name, name)  # Если нужно, add_device("admin", name, key_name=name)
-        # self.app.push_screen(MessageView("Success", f"Key '{name}' has been created."))
-        self.app.pop_screen()
+        new_device = add_device("admin", name, name)
+
+        self.dismiss(result=new_device["device_id"])
 
     def action_save_key(self):
         self.create_key()

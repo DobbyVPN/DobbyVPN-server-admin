@@ -1,9 +1,7 @@
 """
 outline_manager.py
 
-Этот файл предоставляет функционал для взаимодействия с сервером Outline VPN с использованием API-класса OutlineVPN.
-Включены функции для создания, удаления, просмотра и
-переименования ключей, а также извлечения ключа по accessUrl.
+API FOR OUTLINE VPN SERVER
 """
 
 import os
@@ -18,14 +16,10 @@ from helper.parser import parse_env_json
 
 load_dotenv(dotenv_path="../.env")
 # --------------------------------------------
-# Настройки для подключения к Outline серверу
+# Outline server connetcing settings
 # --------------------------------------------
 API_URL, CERT_SHA256 = parse_env_json("Json")
 #print(API_URL, CERT_SHA256)
-
-# --------------------------------------------
-# Классы и исключения из предоставленной обёртки API Outline
-# --------------------------------------------
 
 UNABLE_TO_GET_METRICS_ERROR = "Unable to get metrics"
 
@@ -64,9 +58,7 @@ class OutlineLibraryException(Exception):
     pass
 
 class _FingerprintAdapter(requests.adapters.HTTPAdapter):
-    """
-    Adapter для проверки отпечатка сертификата.
-    """
+
     def __init__(self, fingerprint=None, **kwargs):
         self.fingerprint = str(fingerprint)
         super(_FingerprintAdapter, self).__init__(**kwargs)
@@ -80,10 +72,7 @@ class _FingerprintAdapter(requests.adapters.HTTPAdapter):
         )
 
 class OutlineVPN:
-    """
-    Класс для взаимодействия с Outline сервером.
-    Требует API URL и SHA256.
-    """
+
     def __init__(self, api_url: str, cert_sha256: str):
         self.api_url = api_url
         if cert_sha256:
@@ -308,106 +297,74 @@ class OutlineVPN:
         )
         return response.status_code == 204
 
-# --------------------------------------------
-# Инициализация экземпляра OutlineVPN
-# --------------------------------------------
 try:
     outline_vpn = OutlineVPN(api_url=API_URL, cert_sha256=CERT_SHA256)
 except OutlineLibraryException as e:
-    #print(f"Ошибка инициализации OutlineVPN: {e}")
     outline_vpn = None
 
 
-# --------------------------------------------
-# Оболочка API
-# --------------------------------------------
 
 def create_outline_access_key(name: str) -> str:
-    """
-    Создает новый ключ доступа в Outline Server с заданным именем.
 
-    Возвращает accessUrl или пустую строку в случае ошибки.
-    """
     if outline_vpn is None:
-        print("OutlineVPN не инициализирован")
+        print("OutlineVPN is not initialized")
         return ""
     try:
         key = outline_vpn.create_key(name=name)
         return key.access_url
     except OutlineServerErrorException as e:
-        print(f"Ошибка создания ключа Outline: {e}")
+        print(f"Error with creating an Outline key: {e}")
         return ""
 
 def delete_outline_access_key(access_key_id: str) -> bool:
-    """
-    Удаляет существующий ключ доступа из Outline Server.
-    Возвращает True, если успешно, иначе False.
-    """
+
     if outline_vpn is None:
-        print("OutlineVPN не инициализирован")
+        print("OutlineVPN is not initialized")
         return False
     try:
         success = outline_vpn.delete_key(access_key_id)
         return success
     except OutlineServerErrorException as e:
-        print(f"Ошибка удаления ключа Outline: {e}")
+        print(f"Error with deleting an Outline key: {e}")
         return False
 
 def get_outline_access_keys() -> typing.List[OutlineKey]:
-    """
-    Получает список всех ключей доступа из Outline Server.
-    Возвращает список OutlineKey.
-    """
+
     global outline_vpn
     load_dotenv(dotenv_path="../.env")
     API_URL, CERT_SHA256 = parse_env_json("Json")
     try:
         outline_vpn = OutlineVPN(api_url=API_URL, cert_sha256=CERT_SHA256)
     except OutlineLibraryException as e:
-        print(f"Ошибка инициализации OutlineVPN: {e}")
+        print(f"OutlineVPN is not initialized: {e}")
         return []
 
     if outline_vpn is None:
-        print("OutlineVPN не инициализирован")
+        print("OutlineVPN is not initialized")
         return []
     try:
         return outline_vpn.get_keys()
     except OutlineServerErrorException as e:
-        print(f"Ошибка получения ключей Outline: {e}")
+        print(f"Error with getting Outline keys: {e}")
         return []
 
 def rename_outline_access_key(access_key_id: str, name: str) -> bool:
-    """
-    Переименовывает ключ доступа в Outline Server.
-    Возвращает True, если успешно.
-    """
+
     if outline_vpn is None:
-        print("OutlineVPN не инициализирован")
+        print("OutlineVPN is not initialized")
         return False
     try:
         success = outline_vpn.rename_key(access_key_id, name)
         return success
     except OutlineServerErrorException as e:
-        print(f"Ошибка переименования ключа Outline: {e}")
+        print(f"Error with renaming a key: {e}")
         return False
 
 def extract_access_key_id(access_url: str) -> str:
-    """
-    Извлекает идентификатор ключа доступа из accessUrl.
-    Если извлечение невозможно напрямую, предпринимается попытка найти ключ по имени.
-
-    В Outline accessUrl обычно выглядит как:
-    ss://<method>:<password>@<hostname>:<port>#<name>
-
-    Уникальный key_id не зашит напрямую в URL, но в URL есть имя ключа (fragment).
-    Мы можем пройтись по списку ключей и найти тот, у которого имя совпадает с name.
-    """
     parsed_url = urllib.parse.urlparse(access_url)
-    fragment = parsed_url.fragment  # имя ключа после "#"
+    fragment = parsed_url.fragment
 
     if not fragment:
-        # Если в URL нет фрагмента - вернём пустую строку или
-        # можно реализовать дополнительную логику, но это потом
         return ""
 
     keys = get_outline_access_keys()
