@@ -51,3 +51,10 @@
     ```bash
     python main.py
     ```
+
+**Adding alias:**
+   Add this line in the end of `.bashrc`
+
+   ```alias admintui="docker run --rm --net=host -v /root/DobbyVPN-server-admin/.env:/.env -it ghcr.io/dobbyvpn/dobbyvpn-server-admin/admin-tui```
+
+   Then `source .bashrc`. Now you can invoke admin tool via `admintui` in CLI.
