@@ -34,5 +34,12 @@ jobs:
           OWNER=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
           REPO=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
           IMAGE_NAME="ghcr.io/$OWNER/$REPO/admin-tui"
-          docker build -f Dockerfile -t "$IMAGE_NAME:v1.0.${{ github.run_number }}" -t "$IMAGE_NAME:latest" .
+          VERSION="v1.0".${{ github.run_number }}
+
+          IFS='.' read -r A B C <<< "${VERSION#v}"
+          VA="v$A"
+          VB="v$A.$B"
+          VC="v$A.$B.$C"
+          docker build -f Dockerfile -t "$IMAGE_NAME:$VA" -t "$IMAGE_NAME:$VB" -t "$IMAGE_NAME:$VC" -t "$IMAGE_NAME:latest" .
           docker push "$IMAGE_NAME" --all-tags
+
