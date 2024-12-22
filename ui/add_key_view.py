@@ -1,4 +1,5 @@
 # ui/add_key_view.py
+
 from textual.binding import Binding
 from textual.widgets import Static, Input, Button, Footer
 from managers.device_manager import add_device
@@ -35,9 +36,8 @@ class AddKeyView(BaseScreen):
         if not name:
             self.app.push_screen(MessageView("Error", "You must enter a name"))
             return
-        new_device = add_device("admin", name, name)
-
-        self.dismiss(result=new_device["device_id"])
+        add_device("admin", name, name)
+        self.app.pop_screen()
 
     def action_save_key(self):
         self.create_key()
@@ -47,3 +47,7 @@ class AddKeyView(BaseScreen):
             self.create_key()
         elif event.button.name == "cancel":
             self.app.pop_screen()
+
+    def on_input_submitted(self, event: Input.Submitted) -> None:
+        if event.input is self.input_name:
+            self.create_key()
