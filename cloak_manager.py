@@ -1,7 +1,7 @@
 import sys
 from dotenv import load_dotenv
 from helper.parser import parse_env_json
-from outline_vpn.outline_vpn import OutlineVPN, OutlineServerErrorException
+from outline_vpn.outline_vpn import OutlineVPN
 
 
 def help_command():
