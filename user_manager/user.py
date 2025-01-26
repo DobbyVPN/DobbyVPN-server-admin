@@ -22,7 +22,7 @@ class User:
 		print(f"User {self._name}")
 
 		for device in self._devices:
-			print(f"- {device.dtype}")
+			print(f" {device.dtype}")
 
 			for key in device.keys:
-				print(f"{key}")
+				print(f"  {key}")

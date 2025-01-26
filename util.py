@@ -23,10 +23,9 @@ def outline_device() -> Device:
 
 
 def outline_key_to_string(key) -> str:
-	return """{{
-	"key_id": "{key_id}",
-	"name": "{name}",
-	"access_url ": "{access_url}",
-	"used_bytes": {used_bytes},
-	"data_limit": {data_limit},
-}}""".format(key_id=key.key_id, name=key.name, access_url=key.access_url, used_bytes=key.used_bytes, data_limit=key.data_limit)
+	return "{key_id} \"{name}\" \"{access_url}\" {used_bytes} {data_limit}".format(
+		key_id=key.key_id,
+		name=key.name,
+		access_url=key.access_url,
+		used_bytes=key.used_bytes,
+		data_limit=key.data_limit)
