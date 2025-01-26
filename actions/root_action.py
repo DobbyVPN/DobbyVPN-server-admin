@@ -74,7 +74,7 @@ class DelUserAction(Action):
 		removing_user = all_users[user_index]
 
 		if input(f"Remove user #{user_chose} {removing_user.name} [y/N]? ") == 'y':
-			self._user_manager.remove_user(user_index)
+			self._user_manager.remove_user(removing_user.name)
 
 		return self._root_context
 

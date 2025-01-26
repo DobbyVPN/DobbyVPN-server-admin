@@ -39,8 +39,14 @@ class OutlineVpnInterface:
 		return outline_user
 
 	def remove_user(self, user_name: str):
-		for del_key in filter(lambda key: key.name == user_name, self._outline_vpn.get_keys()):
-			self._outline_vpn.delete_key(del_key.key_id)
+		print(f"Removing user {user_name}")
+
+		for del_key in self._outline_vpn.get_keys():
+			if del_key.name == user_name:
+				print(f"Removing key: {del_key.key_id}")
+				self._outline_vpn.delete_key(del_key.key_id)
+			else:
+				print(f"{del_key.name} != {user_name}")
 
 	def print_data(self):
 		print(f"Outline VPN interface:")
