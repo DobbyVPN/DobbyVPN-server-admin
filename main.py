@@ -1,5 +1,5 @@
 from actions.root_action import *
-from actions.user_manager import UserManager
+from user_manager.user_manager import UserManager
 
 
 user_manager = UserManager()
@@ -7,6 +7,8 @@ context = RootContext()
 context.add_action(MakeUserAction(user_manager, context))
 context.add_action(ListUsersAction(user_manager, context))
 context.add_action(DelUserAction(user_manager, context))
+context.add_action(AddInterfaceAction(user_manager, context))
+context.add_action(ListInterfacesAction(user_manager, context))
 
 
 if __name__ == "__main__":
