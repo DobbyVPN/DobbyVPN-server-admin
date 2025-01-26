@@ -16,12 +16,17 @@ def join_users(user1: User, user2: User) -> User:
 	return User(user1.name, joined_devices)
 
 
-def outline_device(outline_key) -> Device:
+def outline_device() -> Device:
 	dtype = "OutlineVPN device key"
-	key_data = f"""[
-	"key_id": {outline_key.key_id},
-	"name": {outline_key.name},
-	"access_url": {outline_key.access_url}
-]"""
 
-	return Device(dtype=dtype, keys=[key_data])
+	return Device(dtype=dtype, keys=[])
+
+
+def outline_key_to_string(key) -> str:
+	return """{{
+	"key_id": "{key_id}",
+	"name": "{name}",
+	"access_url ": "{access_url}",
+	"used_bytes": {used_bytes},
+	"data_limit": {data_limit},
+}}""".format(key_id=key.key_id, name=key.name, access_url=key.access_url, used_bytes=key.used_bytes, data_limit=key.data_limit)

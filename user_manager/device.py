@@ -5,6 +5,9 @@ class Device:
 		self._dtype = dtype
 		self._keys = keys
 
+	def add_key(self, key: str):
+		self._keys.append(key)
+
 	@property
 	def dtype(self) -> str:
 		return self._dtype

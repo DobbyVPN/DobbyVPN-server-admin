@@ -4,7 +4,7 @@ from vpn_interface.vpn_interface import VpnInterface
 from user_manager.user import User
 from user_manager.device import Device
 from outline_vpn.outline_vpn import OutlineVPN
-from util import outline_device
+from util import outline_device, outline_key_to_string
 
 
 class OutlineVpnInterface:
@@ -17,16 +17,19 @@ class OutlineVpnInterface:
 		vpn_keys = self._outline_vpn.get_keys()
 		indicies = range(len(vpn_keys))
 		users = {}
+		devices = {}
 
 		for index, key in zip(indicies, vpn_keys):
 			if key.name not in users.keys():
-				new_user = User(key.name)
+				new_device = outline_device()
+				new_user = User(key.name, [new_device])
 				users[key.name] = new_user
+				devices[key.name] = new_device
 
-			device = outline_device(key)
-			users[key.name].add_device(device)
+			key_value = outline_key_to_string(key)
+			devices[key.name].add_key(key_value)
 
-		return users.values()
+		return list(users.values())
 	
 	def add_user(self, user_name: str) -> User:
 		outline_key = self._outline_vpn.create_key(key_id=None, name=user_name)
@@ -37,7 +40,7 @@ class OutlineVpnInterface:
 
 	def remove_user(self, user_name: str):
 		for del_key in filter(lambda key: key.name == user_name, self._outline_vpn.get_keys()):
-			client.delete_key(del_key.key_id)
+			self._outline_vpn.delete_key(del_key.key_id)
 
 	def print_data(self):
 		print(f"Outline VPN interface:")
