@@ -33,7 +33,9 @@ class OutlineVpnInterface:
 	
 	def add_user(self, user_name: str) -> User:
 		outline_key = self._outline_vpn.create_key(key_id=None, name=user_name)
-		outline_dev = outline_device(outline_key)
+		outline_key_string = outline_key_to_string(outline_key)
+		outline_dev = outline_device()
+		outline_dev.add_key(outline_key_string)
 		outline_user = User(user_name, [outline_dev])
 
 		return outline_user
