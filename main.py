@@ -1,29 +1,38 @@
 from actions.root_action import *
 from user_manager.user_manager import UserManager
-
-
-user_manager = UserManager()
-context = RootContext()
-context.add_action(MakeUserAction(user_manager, context))
-context.add_action(ListUsersAction(user_manager, context))
-context.add_action(DelUserAction(user_manager, context))
-context.add_action(AddInterfaceAction(user_manager, context))
-context.add_action(ListInterfacesAction(user_manager, context))
+from util import *
 
 
 if __name__ == "__main__":
-	while True:
-		context_actions = context.actions
-		context_actions_indices = range(len(context_actions))
+	user_manager = UserManager()
+	context = RootContext()
+	context.add_action(MakeUserAction(user_manager, context))
+	context.add_action(ListKeysAction(user_manager, context))
+	context.add_action(DelUserAction(user_manager, context))
+	context.add_action(AddInterfaceAction(user_manager, context))
+	context.add_action(ListInterfacesAction(user_manager, context))
 
-		for index, action in zip(context_actions_indices, context_actions):
+	while True:
+		for index, action in with_index(context.actions):
 			print(f"[{index + 1}] {action.description}")
 
-		user_chose = input("Select action or write down 'q' to exit: ")
+		try:
+			user_chose = input("Select action or write down 'q' to exit: ")
+		except KeyboardInterrupt:
+			print("\nKeyboardInterrupt: exit user cycle")
+			break
 
 		if user_chose == 'q':
 			break
 		else:
-			action_index = int(user_chose) - 1
-			user_action = context_actions[action_index]
-			context = user_action.execute()
+			try:
+				action_index = int(user_chose) - 1
+				user_action = context.actions[action_index]
+			except Exception:
+				print("Invalid input")
+				continue
+
+			try:
+				context = user_action.execute()
+			except Exception as ex:
+				print(f"Exception during user action execute: {ex}")

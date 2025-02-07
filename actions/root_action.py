@@ -1,9 +1,8 @@
 from typing import List
 
 from actions.action import Action, ActionContext
-from actions.add_vpn_action import AddVpnInterfaceActionContext
 from user_manager.user_manager import UserManager
-from vpn_interface.vpn_interface import VpnInterface
+from vpn_interface.vpn_interface import ExternalVpnInterface
 
 from util import *
 
@@ -30,26 +29,22 @@ class MakeUserAction(Action):
 
 	def execute(self) -> ActionContext:
 		user_name = input("Put user name: ")
-		new_user = self._user_manager.add_user(user_name)
-		new_user.print_data()
+		self._user_manager.add_user(user_name)
 
 		return self._root_context
 
 
-class ListUsersAction(Action):
+class ListKeysAction(Action):
 	def __init__(self, user_manager: UserManager, root_context: ActionContext):
 		self._user_manager = user_manager
 		self._root_context = root_context
 
 	@property
 	def description(self) -> str:
-		return "List all users"
+		return "List all keys"
 
 	def execute(self) -> ActionContext:
-		all_users = self._user_manager.users
-
-		for user in all_users:
-			user.print_data()
+		self._user_manager.list_keys()
 
 		return self._root_context
 
@@ -64,17 +59,8 @@ class DelUserAction(Action):
 		return "Delete user"
 
 	def execute(self) -> ActionContext:
-		all_users = self._user_manager.users
-		indicies = range(0, len(all_users))
-		for index, user in zip(indicies, all_users):
-			print(f"{index + 1}) {user.name}")
-
-		user_chose = int(input("Enter user index: "))
-		user_index = user_chose - 1
-		removing_user = all_users[user_index]
-
-		if input(f"Remove user #{user_chose} {removing_user.name} [y/N]? ") == 'y':
-			self._user_manager.remove_user(removing_user.name)
+		user_name = input("Put user name: ")
+		self._user_manager.remove_user(user_name)
 
 		return self._root_context
 
@@ -89,9 +75,29 @@ class AddInterfaceAction(Action):
 		return "Add VPN interface"
 
 	def execute(self) -> ActionContext:
-		print("Changing context to make VPN interface")
+		supported_vpns = [
+			("outline", "users/outline_management.py", "Outline VPN"),
+			("awg", "users/amneziawg_management.py", "AmneziaWG VPN"),
+		]
 
-		return AddVpnInterfaceActionContext(self._user_manager, self._root_context)
+		print("Supported server VPN interface:")
+		for index, item in with_index(supported_vpns):
+			print(f"{index + 1}) {item[0]}")
+
+		user_input = input(f"Enter server VPN interface: (1..{len(supported_vpns)})")
+		supported_vpn_index = int(user_input) - 1
+		supported_vpn = supported_vpns[supported_vpn_index]
+
+		vpn_interface = ExternalVpnInterface(
+			supported_vpn[2],
+			supported_vpn[1],
+			host=input("Enter host: "),
+			port=input("Enter port: "),
+			username=input("Enter username: "),
+			password=input("Enter password: "))
+		self._user_manager.add_vpn_interface(vpn_interface)
+
+		return self._root_context
 
 
 class ListInterfacesAction(Action):
@@ -105,6 +111,6 @@ class ListInterfacesAction(Action):
 
 	def execute(self) -> ActionContext:
 		for vpn_interface in self._user_manager.vpn_interfaces:
-			vpn_interface.print_data()
+			print(vpn_interface)
 
 		return self._root_context
