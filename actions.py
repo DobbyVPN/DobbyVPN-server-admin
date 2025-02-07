@@ -1,10 +1,24 @@
 from typing import List
 
-from actions.action import Action, ActionContext
-from user_manager.user_manager import UserManager
-from vpn_interface.vpn_interface import ExternalVpnInterface
-
+from user_manager import UserManager
+from vpn_interface import ExternalVpnInterface
 from util import *
+
+class Action:
+	@property
+	def description(self) -> str:
+		raise NotImplementedError
+	
+
+	def execute(self):
+		raise NotImplementedError
+
+
+class ActionContext:
+	@property
+	def actions(self):
+		raise NotImplementedError
+
 
 class RootContext(ActionContext):
 	def __init__(self):

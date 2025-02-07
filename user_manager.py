@@ -1,5 +1,6 @@
 from typing import List, Optional
-from vpn_interface.vpn_interface import ExternalVpnInterface
+
+from vpn_interface import ExternalVpnInterface
 
 
 class UserManager:

@@ -1,5 +1,5 @@
-from actions.root_action import *
-from user_manager.user_manager import UserManager
+from actions import *
+from user_manager import UserManager
 from util import *
 
 
