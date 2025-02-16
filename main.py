@@ -1,4 +1,3 @@
-import util
 from vpn_interface import ExternalVpnInterface
 
 
@@ -12,6 +11,12 @@ class AppContext:
 	@property
 	def vpn_interfaces(self) -> list[ExternalVpnInterface]:
 		return self._vpn_interfaces
+
+
+def with_index(arr):
+	idx = range(len(arr))
+
+	return zip(idx, arr)
 
 
 def list_command(context: AppContext):
@@ -41,7 +46,7 @@ def add_vpn_command(context: AppContext):
 
 	print("Supported server VPN interfaces:")
 
-	for index, item in util.with_index(supported_vpns):
+	for index, item in with_index(supported_vpns):
 		print(f"{index + 1}) {item[0]}")
 
 	user_input = input(f"Enter server VPN interface: ")
@@ -72,7 +77,7 @@ if __name__ == "__main__":
 		("List VPN servers", list_vpn_command)]
 
 	while True:
-		for index, command in util.with_index(commands):
+		for index, command in with_index(commands):
 			print(f"[{index + 1}] {command[0]}")
 
 		try:
