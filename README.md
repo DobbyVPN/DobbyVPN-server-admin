@@ -4,30 +4,42 @@
 
 ### Prerequisites
 
-- **git**
-- **python**
-- **pip** (Python package installer)
+- **Git**
+- **Python 3.12+**
+- [**UV**](https://github.com/astral-sh/uv)
 
 ### Installation Steps
+
+#### Download UV
+
+```bash
+# Install uv on macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+# Install uv on macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+#### Download repository
 
 ```bash
 git clone https://github.com/DobbyVPN/DobbyVPN-server-admin.git
 cd DobbyVPN-server-admin
-pip install -r requirements.txt
-python3 main.py
+```
+
+### Run admin
+
+Simply run
+
+```bash
+./admin.py
 ```
 
 ## Usage
 
-`main.py` python script is a terminal app, that runs user cycle, waiting for one of the next commands:
+`admin.py` python script is a terminal app, that runs user cycle, waiting for one of the next commands:
 
-* Add user to all added VPNs
-* Remove user from all add VPNs
-* List of all keys for every added VPN
-* Add VPN interface
-* Get list of added VPN interfaces
-
-When we run VPN user management command (for example: `add`), we are doing next steps:
-1. Make SSH connection with every added VPN
-1. For each VPN machine run user management script. VPN machine expected to be Dobby VPN server, that uses [DobbyVPN-server repository](https://github.com/DobbyVPN/DobbyVPN-server) on the `~/DobbyVPN-server/` path, where our user management script is being run
-1. Redirect STDIN and STDOUT of user managemnt script to our admin STDOUT
+* Add user to all VPNs
+* Remove user from all VPNs
+* List of all keys for every VPN
+* Add VPN server
+* List VPN servers
