@@ -11,21 +11,15 @@ class ExternalVpnInterface:
 	def __init__(
 			self,
 			interface_name: str,
-			script_name: str,
 			host: str,
 			port: str = "22",
 			username: Optional[str] = None,
-			password: Optional[str] = None,
-			server_workdir: str = "DobbyVPN-server/",
-			server_python: str = "python3"):
+			password: Optional[str] = None):
 		self._interface_name = interface_name
-		self._script_name = script_name
 		self._host = host
 		self._port = port
 		self._username = username
 		self._password = password
-		self._server_workdir = server_workdir
-		self._server_python = server_python
 
 	def list_keys(self, user_name: Optional[str] = None):
 		client = paramiko.SSHClient()
@@ -44,21 +38,20 @@ class ExternalVpnInterface:
 
 		try:
 			if user_name is None:
-				command = f"cd {self._server_workdir} && {self._server_python} {self._script_name} list"
+				command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py list"
 			else:
-				command = f"cd {self._server_workdir} && {self._server_python} {self._script_name} list {user_name}"
+				command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py list {user_name}"
+
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
 			raise ExternalVpnInterfaceException("Command execution error", ex)
 		
 		stdin.close()
-		print("=== STDOUT ===")
+		print("stdout:")
 		print(stdout.read().decode('utf-8'))
-		print("==============")
 		stdout.close()
-		print("=== STDERR ===")
+		print("stderr")
 		print(stderr.read().decode('utf-8'))
-		print("==============")
 		stderr.close()
 
 		client.close()
@@ -79,18 +72,18 @@ class ExternalVpnInterface:
 			raise ExternalVpnInterfaceException("Connection error", ex)
 
 		try:
-			stdin, stdout, stderr = client.exec_command(f"cd {self._server_workdir} && {self._server_python} {self._script_name} add {user_name}")
+			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py add {user_name}"
+
+			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
 			raise ExternalVpnInterfaceException("Command execution error", ex)
 		
 		stdin.close()
-		print("=== STDOUT ===")
+		print("stdout")
 		print(stdout.read().decode('utf-8'))
-		print("==============")
 		stdout.close()
-		print("=== STDERR ===")
+		print("stderr")
 		print(stderr.read().decode('utf-8'))
-		print("==============")
 		stderr.close()
 
 		client.close()
@@ -111,18 +104,18 @@ class ExternalVpnInterface:
 			raise ExternalVpnInterfaceException("Connection error", ex)
 
 		try:
-			stdin, stdout, stderr = client.exec_command(f"cd {self._server_workdir} && {self._server_python} {self._script_name} del {user_name}")
+			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py del {user_name}"
+
+			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
 			raise ExternalVpnInterfaceException("Command execution error", ex)
 		
 		stdin.close()
-		print("=== STDOUT ===")
+		print("stdout")
 		print(stdout.read().decode('utf-8'))
-		print("==============")
 		stdout.close()
-		print("=== STDERR ===")
+		print("stderr")
 		print(stderr.read().decode('utf-8'))
-		print("==============")
 		stderr.close()
 
 		client.close()
