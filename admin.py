@@ -6,6 +6,7 @@
 #     "outline-vpn-api",
 # ]
 # ///
+import getpass
 import paramiko
 
 from typing import List, Optional
@@ -182,6 +183,18 @@ def input_string_or_else(title: str, default: Optional[str]) -> Optional[str]:
 		return default
 
 
+def input_password_or_else(title: str, default: Optional[str]) -> Optional[str]:
+	try:
+		value = getpass.getpass(f"Enter {title}[{default}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	if value.strip():
+		return value.strip()
+	else:
+		return default
+
+
 def input_integer(title: str) -> int:
 	try:
 		value = input(f"Enter {title} ")
@@ -267,7 +280,7 @@ def add_vpn_command(context: AppContext):
 		host=input_string("host"),
 		port=input_string_or_else("port", "22"),
 		username=input_string_or_else("username", None),
-		password=input_string_or_else("password", None))
+		password=input_password_or_else("password", None))
 	context.add_vpn_interface(vpn_interface)
 
 
