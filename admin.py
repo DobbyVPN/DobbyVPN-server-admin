@@ -133,6 +133,16 @@ class VpnServerException(Exception):
     pass
 
 
+class KeyboardInterruptException(Exception):
+	def __init__(self):
+		super().__init__("Keyboard interrup exception")
+
+
+class InvalidInputException(Exception):
+	def __init__(self):
+		super().__init__("Invalid input exception")
+
+
 class AppContext:
 	def __init__(self):
 		self._vpn_interfaces = []
@@ -151,9 +161,63 @@ def with_index(arr):
 	return zip(idx, arr)
 
 
+def input_string(title: str) -> str:
+	try:
+		value = input(f"Enter {title} ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	return value.strip()
+
+
+def input_string_or_else(title: str, default: Optional[str]) -> Optional[str]:
+	try:
+		value = input(f"Enter {title}[{default}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	if value.strip():
+		return value.strip()
+	else:
+		return default
+
+
+def input_integer(title: str) -> int:
+	try:
+		value = input(f"Enter {title} ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	try:
+		value_as_int = int(value)
+	except ValueError:
+		raise InvalidInputException()
+
+	return value_as_int
+
+
+def input_range(title: str, min_value: int, max_value: int) -> int:
+	try:
+		value = input(f"Enter {title}[{min_value}..{max_value}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	try:
+		value_as_int = int(value)
+	except ValueError:
+		raise InvalidInputException()
+
+	if value_as_int in range(min_value, max_value):
+		return value_as_int
+	else:
+		raise InvalidInputException()
+
+
 def list_command(context: AppContext):
+	user_name = input_string_or_else("user name", None)
+
 	for vpn_interface in context.vpn_interfaces:
-		stdout, stderr = vpn_interface.list_keys()
+		stdout, stderr = vpn_interface.list_keys(user_name)
 
 		print(vpn_interface)
 		print(stdout.strip())
@@ -161,7 +225,7 @@ def list_command(context: AppContext):
 		print(stderr.strip())
 
 def add_command(context: AppContext):
-	user_name = input("Enter user name: ")
+	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
 		stdout, stderr = vpn_interface.add_user(user_name)
@@ -173,7 +237,7 @@ def add_command(context: AppContext):
 
 
 def del_command(context: AppContext):
-	user_name = input("Enter user name: ")
+	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
 		stdout, stderr = vpn_interface.remove_user(user_name)
@@ -195,16 +259,15 @@ def add_vpn_command(context: AppContext):
 	for index, item in with_index(supported_vpns):
 		print(f"{index + 1}) {item[0]}")
 
-	user_input = input(f"Enter server VPN interface: ")
-	supported_vpn_index = int(user_input) - 1
+	supported_vpn_index = input_range("server VPN interface", 1, len(supported_vpns) + 1) - 1
 	supported_vpn = supported_vpns[supported_vpn_index]
 
 	vpn_interface = VpnServer(
 		supported_vpn[1],
-		host=input("Enter host: "),
-		port=input("Enter port: "),
-		username=input("Enter username: "),
-		password=input("Enter password: "))
+		host=input_string("host"),
+		port=input_string_or_else("port", "22"),
+		username=input_string_or_else("username", None),
+		password=input_string_or_else("password", None))
 	context.add_vpn_interface(vpn_interface)
 
 
@@ -227,10 +290,10 @@ if __name__ == "__main__":
 			print(f"[{index + 1}] {command[0]}")
 
 		try:
-			user_chose = input("Select action or write down 'q' to exit: ")
-		except KeyboardInterrupt:
-			print("\nKeyboardInterrupt: exit user cycle")
-			break
+			user_chose = input_string_or_else("action (or q to exit)", "q")
+		except Exception as ex:
+			print(ex)
+			continue
 
 		if user_chose == 'q':
 			break
@@ -245,4 +308,4 @@ if __name__ == "__main__":
 			try:
 				user_action(app_context)
 			except Exception as ex:
-				print(f"Exception during user action execute: {ex}")
+				print(ex)
