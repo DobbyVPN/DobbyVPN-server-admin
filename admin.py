@@ -11,25 +11,25 @@ import paramiko
 from typing import List, Optional
 
 
-class ExternalVpnInterface:
+class VpnServer:
 	"""
-	Wrapper around ssh connetion to the external VPN interface
+	External VPN server
 	"""
 
 	def __init__(
 			self,
-			interface_name: str,
+			name: str,
 			host: str,
 			port: str = "22",
 			username: Optional[str] = None,
 			password: Optional[str] = None):
-		self._interface_name = interface_name
+		self._name = name
 		self._host = host
 		self._port = port
 		self._username = username
 		self._password = password
 
-	def list_keys(self, user_name: Optional[str] = None):
+	def list_keys(self, user_name: Optional[str] = None) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -42,7 +42,7 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			if user_name is None:
@@ -52,19 +52,18 @@ class ExternalVpnInterface:
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout:")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
+
+		return (stdout_string, stderr_string)
 	
-	def add_user(self, user_name: str):
+	def add_user(self, user_name: str) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -77,26 +76,25 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py add {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
 
-	def remove_user(self, user_name: str):
+		return (stdout_string, stderr_string)
+
+	def remove_user(self, user_name: str) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -109,38 +107,41 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py del {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
 
+		return (stdout_string, stderr_string)
+
 	def __str__(self):
-		return f"{self._interface_name} on the host {self._host}"
+		return f"{self._name} on {self._host}"
+
+
+class VpnServerException(Exception):
+    pass
 
 
 class AppContext:
 	def __init__(self):
 		self._vpn_interfaces = []
 
-	def add_vpn_interface(self, vpn_interface: ExternalVpnInterface):
+	def add_vpn_interface(self, vpn_interface: VpnServer):
 		self._vpn_interfaces.append(vpn_interface)
 
 	@property
-	def vpn_interfaces(self) -> List[ExternalVpnInterface]:
+	def vpn_interfaces(self) -> List[VpnServer]:
 		return self._vpn_interfaces
 
 
@@ -152,21 +153,35 @@ def with_index(arr):
 
 def list_command(context: AppContext):
 	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.list_keys()
+		stdout, stderr = vpn_interface.list_keys()
 
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 def add_command(context: AppContext):
 	user_name = input("Enter user name: ")
 
 	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.add_user(user_name)
+		stdout, stderr = vpn_interface.add_user(user_name)
+
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 
 def del_command(context: AppContext):
 	user_name = input("Enter user name: ")
 
 	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.remove_user(user_name)
+		stdout, stderr = vpn_interface.remove_user(user_name)
+
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 
 def add_vpn_command(context: AppContext):
@@ -184,7 +199,7 @@ def add_vpn_command(context: AppContext):
 	supported_vpn_index = int(user_input) - 1
 	supported_vpn = supported_vpns[supported_vpn_index]
 
-	vpn_interface = ExternalVpnInterface(
+	vpn_interface = VpnServer(
 		supported_vpn[1],
 		host=input("Enter host: "),
 		port=input("Enter port: "),
