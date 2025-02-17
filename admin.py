@@ -6,30 +6,31 @@
 #     "outline-vpn-api",
 # ]
 # ///
+import getpass
 import paramiko
 
 from typing import List, Optional
 
 
-class ExternalVpnInterface:
+class VpnServer:
 	"""
-	Wrapper around ssh connetion to the external VPN interface
+	External VPN server
 	"""
 
 	def __init__(
 			self,
-			interface_name: str,
+			name: str,
 			host: str,
 			port: str = "22",
 			username: Optional[str] = None,
 			password: Optional[str] = None):
-		self._interface_name = interface_name
+		self._name = name
 		self._host = host
 		self._port = port
 		self._username = username
 		self._password = password
 
-	def list_keys(self, user_name: Optional[str] = None):
+	def list_keys(self, user_name: Optional[str] = None) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -42,7 +43,7 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			if user_name is None:
@@ -52,19 +53,18 @@ class ExternalVpnInterface:
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout:")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
+
+		return (stdout_string, stderr_string)
 	
-	def add_user(self, user_name: str):
+	def add_user(self, user_name: str) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -77,26 +77,25 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py add {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
 
-	def remove_user(self, user_name: str):
+		return (stdout_string, stderr_string)
+
+	def remove_user(self, user_name: str) -> tuple[str, str]:
 		client = paramiko.SSHClient()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -109,38 +108,51 @@ class ExternalVpnInterface:
 				look_for_keys=False,
 				allow_agent=False)
 		except Exception as ex:
-			print(f"Connection error: {ex}")
+			raise VpnServerException(f"Connection error: {ex}")
 
 		try:
 			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py del {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
-			print(f"Command execution error: {ex}")
+			raise VpnServerException(f"Command execution error: {ex}")
 		
 		stdin.close()
-		print("stdout")
-		print(stdout.read().decode('utf-8'))
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
 		stdout.close()
-		print("stderr")
-		print(stderr.read().decode('utf-8'))
 		stderr.close()
-
 		client.close()
 
+		return (stdout_string, stderr_string)
+
 	def __str__(self):
-		return f"{self._interface_name} on the host {self._host}"
+		return f"{self._name} on {self._host}"
+
+
+class VpnServerException(Exception):
+    pass
+
+
+class KeyboardInterruptException(Exception):
+	def __init__(self):
+		super().__init__("Keyboard interrup exception")
+
+
+class InvalidInputException(Exception):
+	def __init__(self):
+		super().__init__("Invalid input exception")
 
 
 class AppContext:
 	def __init__(self):
 		self._vpn_interfaces = []
 
-	def add_vpn_interface(self, vpn_interface: ExternalVpnInterface):
+	def add_vpn_interface(self, vpn_interface: VpnServer):
 		self._vpn_interfaces.append(vpn_interface)
 
 	@property
-	def vpn_interfaces(self) -> List[ExternalVpnInterface]:
+	def vpn_interfaces(self) -> List[VpnServer]:
 		return self._vpn_interfaces
 
 
@@ -150,23 +162,103 @@ def with_index(arr):
 	return zip(idx, arr)
 
 
-def list_command(context: AppContext):
-	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.list_keys()
+def input_string(title: str) -> str:
+	try:
+		value = input(f"Enter {title} ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
 
+	return value.strip()
+
+
+def input_string_or_else(title: str, default: Optional[str]) -> Optional[str]:
+	try:
+		value = input(f"Enter {title}[{default}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	if value.strip():
+		return value.strip()
+	else:
+		return default
+
+
+def input_password_or_else(title: str, default: Optional[str]) -> Optional[str]:
+	try:
+		value = getpass.getpass(f"Enter {title}[{default}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	if value.strip():
+		return value.strip()
+	else:
+		return default
+
+
+def input_integer(title: str) -> int:
+	try:
+		value = input(f"Enter {title} ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	try:
+		value_as_int = int(value)
+	except ValueError:
+		raise InvalidInputException()
+
+	return value_as_int
+
+
+def input_range(title: str, min_value: int, max_value: int) -> int:
+	try:
+		value = input(f"Enter {title}[{min_value}..{max_value}] ")
+	except KeyboardInterrupt:
+		raise KeyboardInterruptException()
+
+	try:
+		value_as_int = int(value)
+	except ValueError:
+		raise InvalidInputException()
+
+	if value_as_int in range(min_value, max_value):
+		return value_as_int
+	else:
+		raise InvalidInputException()
+
+
+def list_command(context: AppContext):
+	user_name = input_string_or_else("user name", None)
+
+	for vpn_interface in context.vpn_interfaces:
+		stdout, stderr = vpn_interface.list_keys(user_name)
+
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 def add_command(context: AppContext):
-	user_name = input("Enter user name: ")
+	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.add_user(user_name)
+		stdout, stderr = vpn_interface.add_user(user_name)
+
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 
 def del_command(context: AppContext):
-	user_name = input("Enter user name: ")
+	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
-		vpn_interface.remove_user(user_name)
+		stdout, stderr = vpn_interface.remove_user(user_name)
+
+		print(vpn_interface)
+		print(stdout.strip())
+		print("STDERR:")
+		print(stderr.strip())
 
 
 def add_vpn_command(context: AppContext):
@@ -180,16 +272,15 @@ def add_vpn_command(context: AppContext):
 	for index, item in with_index(supported_vpns):
 		print(f"{index + 1}) {item[0]}")
 
-	user_input = input(f"Enter server VPN interface: ")
-	supported_vpn_index = int(user_input) - 1
+	supported_vpn_index = input_range("server VPN interface", 1, len(supported_vpns) + 1) - 1
 	supported_vpn = supported_vpns[supported_vpn_index]
 
-	vpn_interface = ExternalVpnInterface(
+	vpn_interface = VpnServer(
 		supported_vpn[1],
-		host=input("Enter host: "),
-		port=input("Enter port: "),
-		username=input("Enter username: "),
-		password=input("Enter password: "))
+		host=input_string("host"),
+		port=input_string_or_else("port", "22"),
+		username=input_string_or_else("username", None),
+		password=input_password_or_else("password", None))
 	context.add_vpn_interface(vpn_interface)
 
 
@@ -212,10 +303,10 @@ if __name__ == "__main__":
 			print(f"[{index + 1}] {command[0]}")
 
 		try:
-			user_chose = input("Select action or write down 'q' to exit: ")
-		except KeyboardInterrupt:
-			print("\nKeyboardInterrupt: exit user cycle")
-			break
+			user_chose = input_string_or_else("action (or q to exit)", "q")
+		except Exception as ex:
+			print(ex)
+			continue
 
 		if user_chose == 'q':
 			break
@@ -230,4 +321,4 @@ if __name__ == "__main__":
 			try:
 				user_action(app_context)
 			except Exception as ex:
-				print(f"Exception during user action execute: {ex}")
+				print(ex)
