@@ -20,14 +20,20 @@ class ExternalVpnInterface:
 			self,
 			interface_name: str,
 			host: str,
-			port: str = "22",
-			username: Optional[str] = None,
-			password: Optional[str] = None):
+			port: str,
+			username: Optional[str],
+			password: Optional[str],
+			image_name: str,
+			image_python_path: str = ".venv/bin/python3",
+			image_script_path: str = "usrmngr/main.py"):
 		self._interface_name = interface_name
 		self._host = host
 		self._port = port
 		self._username = username
 		self._password = password
+		self._image_name = image_name
+		self._image_python_path = image_python_path
+		self._image_script_path = image_script_path
 
 	def list_keys(self, user_name: Optional[str] = None):
 		client = paramiko.SSHClient()
@@ -46,9 +52,9 @@ class ExternalVpnInterface:
 
 		try:
 			if user_name is None:
-				command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py list"
+				command = f"docker exec {self._image_name} {self._image_python_path} {self._image_script_path} list"
 			else:
-				command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py list {user_name}"
+				command = f"docker exec {self._image_name} {self._image_python_path} {self._image_script_path} list {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
@@ -80,7 +86,7 @@ class ExternalVpnInterface:
 			print(f"Connection error: {ex}")
 
 		try:
-			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py add {user_name}"
+			command = f"docker exec {self._image_name} {self._image_python_path} {self._image_script_path} add {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
@@ -112,7 +118,7 @@ class ExternalVpnInterface:
 			print(f"Connection error: {ex}")
 
 		try:
-			command = f"docker exec awg-server .venv/bin/python3 usrmngr/main.py del {user_name}"
+			command = f"docker exec {self._image_name} {self._image_python_path} {self._image_script_path} del {user_name}"
 
 			stdin, stdout, stderr = client.exec_command(command)
 		except Exception as ex:
@@ -171,14 +177,14 @@ def del_command(context: AppContext):
 
 def add_vpn_command(context: AppContext):
 	supported_vpns = [
-		# ("outline", "users/outline_management.py", "Outline VPN"),
-		("awg", "AmneziaWG VPN"),
+		("outline-server", "Outline VPN"),
+		("awg-server", "AmneziaWG VPN"),
 	]
 
 	print("Supported server VPN interfaces:")
 
 	for index, item in with_index(supported_vpns):
-		print(f"{index + 1}) {item[0]}")
+		print(f"{index + 1}) {item[1]}")
 
 	user_input = input(f"Enter server VPN interface: ")
 	supported_vpn_index = int(user_input) - 1
@@ -189,7 +195,8 @@ def add_vpn_command(context: AppContext):
 		host=input("Enter host: "),
 		port=input("Enter port: "),
 		username=input("Enter username: "),
-		password=input("Enter password: "))
+		password=input("Enter password: "),
+		image_name=supported_vpn[0])
 	context.add_vpn_interface(vpn_interface)
 
 
