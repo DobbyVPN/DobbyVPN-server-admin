@@ -236,9 +236,9 @@ def list_command(context: AppContext):
 	user_name = input_string_or_else("user name", None)
 
 	for vpn_interface in context.vpn_interfaces:
-		stdout, stderr = vpn_interface.list_keys(user_name)
-
 		print(vpn_interface)
+
+		stdout, stderr = vpn_interface.list_keys(user_name)
 		print(stdout.strip())
 		print("STDERR:")
 		print(stderr.strip())
@@ -247,9 +247,9 @@ def add_command(context: AppContext):
 	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
-		stdout, stderr = vpn_interface.add_user(user_name)
-
 		print(vpn_interface)
+
+		stdout, stderr = vpn_interface.add_user(user_name)
 		print(stdout.strip())
 		print("STDERR:")
 		print(stderr.strip())
@@ -259,9 +259,9 @@ def del_command(context: AppContext):
 	user_name = input_string("user name")
 
 	for vpn_interface in context.vpn_interfaces:
-		stdout, stderr = vpn_interface.remove_user(user_name)
-
 		print(vpn_interface)
+
+		stdout, stderr = vpn_interface.remove_user(user_name)
 		print(stdout.strip())
 		print("STDERR:")
 		print(stderr.strip())
