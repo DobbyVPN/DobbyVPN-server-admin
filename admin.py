@@ -220,7 +220,7 @@ def input_range(title: str, min_value: int, max_value: int) -> int:
 	except ValueError:
 		raise InvalidInputException()
 
-	if value_as_int in range(min_value, max_value):
+	if value_as_int in range(min_value, max_value + 1):
 		return value_as_int
 	else:
 		raise InvalidInputException()
@@ -272,15 +272,15 @@ def add_vpn_command(context: AppContext):
 	for index, item in with_index(supported_vpns):
 		print(f"{index + 1}) {item[0]}")
 
-	supported_vpn_index = input_range("server VPN interface", 1, len(supported_vpns) + 1) - 1
+	supported_vpn_index = input_range("server VPN interface", 1, len(supported_vpns)) - 1
 	supported_vpn = supported_vpns[supported_vpn_index]
 
 	vpn_interface = VpnServer(
 		supported_vpn[1],
-		host=input_string("host"),
-		port=input_string_or_else("port", "22"),
-		username=input_string_or_else("username", None),
-		password=input_password_or_else("password", None))
+		host=input_string("host:"),
+		port=input_string_or_else("port:", "22"),
+		username=input_string_or_else("username:", None),
+		password=input_password_or_else("password:", None))
 	context.add_vpn_interface(vpn_interface)
 
 
