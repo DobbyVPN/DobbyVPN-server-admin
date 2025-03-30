@@ -22,19 +22,43 @@ class VpnServer:
 			name: str,
 			host: str,
 			port: str,
-			username: Optional[str],
-			password: Optional[str],
+			auth_strategy: paramiko.auth_strategy.AuthStrategy,
 			image_name: str,
 			image_python_path: str = ".venv/bin/python3",
 			image_script_path: str = "usrmngr/main.py"):
 		self._name = name
 		self._host = host
 		self._port = port
-		self._username = username
-		self._password = password
+		self._auth_strategy=auth_strategy
 		self._image_name = image_name
 		self._image_python_path = image_python_path
 		self._image_script_path = image_script_path
+
+	def healthcheck(self) -> tuple[str, str]:
+		client = paramiko.SSHClient()
+		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+		try:
+			client.connect(
+				self._host,
+				port=self._port,
+				auth_strategy=self._auth_strategy)
+		except Exception as ex:
+			raise VpnServerException(f"Connection error: {ex}")
+
+		try:
+			stdin, stdout, stderr = client.exec_command("uname -a")
+		except Exception as ex:
+			raise VpnServerException(f"Command execution error: {ex}")
+		
+		stdin.close()
+		stdout_string = stdout.read().decode('utf-8')
+		stderr_string = stderr.read().decode('utf-8')
+		stdout.close()
+		stderr.close()
+		client.close()
+
+		return (stdout_string, stderr_string)
 
 	def list_keys(self, user_name: Optional[str] = None) -> tuple[str, str]:
 		client = paramiko.SSHClient()
@@ -44,10 +68,7 @@ class VpnServer:
 			client.connect(
 				self._host,
 				port=self._port,
-				username=self._username,
-				password=self._password,
-				look_for_keys=False,
-				allow_agent=False)
+				auth_strategy=self._auth_strategy)
 		except Exception as ex:
 			raise VpnServerException(f"Connection error: {ex}")
 
@@ -267,6 +288,24 @@ def del_command(context: AppContext):
 		print(stderr.strip())
 
 
+def healthcheck(vpn_interface: VpnServer):
+	print(vpn_interface, "healthcheck")
+
+	stdout, stderr = vpn_interface.healthcheck()
+	print(stdout.strip())
+	print("STDERR:")
+	print(stderr.strip())
+
+
+def password_strategy_builder() -> paramiko.auth_strategy.AuthStrategy:
+	username=input_string_or_else("username:", None)
+	password=input_password_or_else("password:", None)
+
+	return paramiko.auth_strategy.Password(
+		username=username,
+		password_getter=lambda : password)
+
+
 def add_vpn_command(context: AppContext):
 	supported_vpns = [
 		("outline-server", "Outline VPN"),
@@ -281,13 +320,26 @@ def add_vpn_command(context: AppContext):
 	supported_vpn_index = input_range("server VPN interface", 1, len(supported_vpns)) - 1
 	supported_vpn = supported_vpns[supported_vpn_index]
 
+	supported_auth_methods = [
+		(password_strategy_builder, "Password authentification")
+	]
+
+	print("Supported SSH auth strategies:")
+	for index, item in with_index(supported_auth_methods):
+		print(f"{index + 1}) {item[1]}")
+
+	supported_auth_index = input_range("server VPN interface", 1, len(supported_auth_methods)) - 1
+	supported_auth_method = supported_auth_methods[supported_auth_index]
+	strategy = supported_auth_method[0]()
+	print(strategy)
+
 	vpn_interface = VpnServer(
 		supported_vpn[1],
 		host=input_string("host:"),
 		port=input_string_or_else("port:", "22"),
-		username=input_string_or_else("username:", None),
-		password=input_password_or_else("password:", None),
+		auth_strategy=strategy,
 		image_name=supported_vpn[0])
+	healthcheck(vpn_interface)
 	context.add_vpn_interface(vpn_interface)
 
 
