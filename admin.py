@@ -257,14 +257,12 @@ def del_command(context: AppContext):
 
 
 def healthcheck(vpn_interface: VpnServer):
-	print("==== HEALTHCHECK ====")
 	print(vpn_interface)
 
 	stdout, stderr = vpn_interface.healthcheck()
 	print(stdout.strip())
 	print("STDERR:")
 	print(stderr.strip())
-	print("=====================")
 
 
 def password_auth_method_builder() -> AuthMethod:
@@ -315,10 +313,15 @@ def add_vpn_command(context: AppContext):
 		auth_method=auth_method,
 		image_name=supported_vpn[0])
 	
-	healthcheck(vpn_interface)
-	
-	context.add_vpn_interface(vpn_interface)
-
+	print("==== HEALTHCHECK ====")
+	try:
+		healthcheck(vpn_interface)
+		print("Healthcheck successful, adding server")
+		context.add_vpn_interface(vpn_interface)
+	except Exception as ex:
+		print("Healthcheck failed, skipping this server")
+		print(">", ex)
+	print("=====================")
 
 def list_vpn_command(context: AppContext):
 	for vpn_interface in context.vpn_interfaces:
@@ -354,7 +357,7 @@ if __name__ == "__main__":
 				print("Invalid input")
 				continue
 
-			# try:
-			user_action(app_context)
-			# except Exception as ex:
-			# 	print(ex)
+			try:
+				user_action(app_context)
+			except Exception as ex:
+				print(ex)
