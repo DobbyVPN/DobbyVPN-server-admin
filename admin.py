@@ -257,12 +257,14 @@ def del_command(context: AppContext):
 
 
 def healthcheck(vpn_interface: VpnServer):
-	print(vpn_interface, "healthcheck")
+	print("==== HEALTHCHECK ====")
+	print(vpn_interface)
 
 	stdout, stderr = vpn_interface.healthcheck()
 	print(stdout.strip())
 	print("STDERR:")
 	print(stderr.strip())
+	print("=====================")
 
 
 def password_auth_method_builder() -> AuthMethod:
