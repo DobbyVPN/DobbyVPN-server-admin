@@ -42,18 +42,21 @@ class PasswordAuthMethod(AuthMethod):
 
 
 class PkeyAuthMethod(AuthMethod):
-	def __init__(self, host: str, port: str):
+	def __init__(self, username: str, host: str, port: str):
+		self._username = username
 		self._host = host
 		self._port = port
 
 	def auth(self):
 		client = paramiko.SSHClient()
+		client.load_system_host_keys()
 		client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
 		try:
 			client.connect(
 				self._host,
-				port=self._port)
+				port=self._port,
+				username=self._username)
 		except Exception as ex:
 			raise VpnServerException(f"Connection error: {ex}")
 
@@ -275,10 +278,11 @@ def password_auth_method_builder() -> AuthMethod:
 
 
 def pkey_auth_method_builder() -> AuthMethod:
+	username=input_string("username:")
 	host=input_string("host:")
 	port=input_string_or_else("port:", "22")
 
-	return PkeyAuthMethod(host, port)
+	return PkeyAuthMethod(username, host, port)
 
 
 def add_vpn_command(context: AppContext):
